@@ -1,0 +1,53 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!78 &1
+TagManager:
+  serializedVersion: 2
+  tags:
+  - BuildingContainer
+  layers:
+  - Default
+  - TransparentFX
+  - Ignore Raycast
+  - 
+  - Water
+  - UI
+  - 
+  - 
+  - Player
+  - PlayerWeapon
+  - Enemy
+  - EnemyWeapon
+  - Obstacle
+  - CameraBounds
+  - Floor
+  - Road
+  - Arch
+  - Wall
+  - 
+  - 
+  - 
+  - 
+  - 
+  - 
+  - 
+  - 
+  - 
+  - 
+  - 
+  - 
+  - 
+  - 
+  m_SortingLayers:
+  - name: Default
+    uniqueID: 0
+    locked: 0
+  - name: Background
+    uniqueID: 4185854925
+    locked: 0
+  - name: Foreground
+    uniqueID: 1924468757
+    locked: 0
+  - name: UI
+    uniqueID: 2598478963
+    locked: 0
