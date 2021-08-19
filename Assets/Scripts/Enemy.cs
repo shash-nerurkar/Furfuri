@@ -19,18 +19,19 @@ public class Enemy : MonoBehaviour
         bullet, 
         projectile,
     }
-    public AttackTypes attackType;// = AttackTypes.bullet;
+    public AttackTypes attackType;
     public World world;
-    public Transform muzzle;
     public Player player;
     public Tilemap buildingTilemap;
-    public GameObject enemyContainer;
+    public Transform enemyContainerTransform;
+    public Transform projectileContainerTransform;
+    public Transform muzzle;
     public Animator animator;
     public GameObject bulletPrefab;
     public GameObject projectilePrefab;
     public LineRenderer bulletLineRenderer;
     public GameObject bulletImpactPrefab;
-    public Transform projectileContainerTransform;
+    public GameObject damageNotifierPrefab;
     private float shootTimer;
     private float despawnTimer;
     public int health = 50;
@@ -43,6 +44,27 @@ public class Enemy : MonoBehaviour
 
     void Start()
     {
+        attackType = (AttackTypes)Random.Range(0, System.Enum.GetValues(typeof(AttackTypes)).Length);
+        world = (World)FindObjectOfType(typeof(World));
+        player = (Player)FindObjectOfType(typeof(Player));
+        Transform[] transforms = (Transform[])FindObjectsOfType(typeof(Transform));
+        foreach(Transform transform in transforms)
+        {
+            switch(transform.gameObject.name)
+            {
+                case "Building":
+                    buildingTilemap = transform.gameObject.GetComponent<Tilemap>();
+                    break;
+                
+                case "Enemy Container":
+                    enemyContainerTransform = transform;
+                    break;
+                
+                case "Projectile Container":
+                    projectileContainerTransform = transform;
+                    break;
+            }
+        }
         // Enemy.DrawCircle(gameObject.transform, gameObject.GetComponent<LineRenderer>(), despawnRange);
         StartCoroutine(MoveToSpawnLocation());
     }
@@ -112,6 +134,7 @@ public class Enemy : MonoBehaviour
 
     public void TakeDamage(int damage) 
     {
+        Instantiate(damageNotifierPrefab, transform.position + new Vector3(0.5f, 0, 0), Quaternion.identity);//Quaternion.Inverse(transform.rotation));
         health -= damage;
         if(health <= 0)
         {

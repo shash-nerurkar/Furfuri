@@ -397,18 +397,25 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: e40495463463d4e47acc6b1350ab958e, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  state: 0
+  attackType: 0
   world: {fileID: 0}
   muzzle: {fileID: 8326907735530471861}
   player: {fileID: 0}
   buildingTilemap: {fileID: 0}
-  health: 50
-  shootRange: 4
-  animator: {fileID: 0}
-  shootCooldown: 3
+  enemyContainer: {fileID: 0}
+  projectileContainerTransform: {fileID: 0}
+  animator: {fileID: 7916574001163925758}
   bulletPrefab: {fileID: 1617334495772175287, guid: 8556fe9fcf5af67428bb6b03edd7797d, type: 3}
   projectilePrefab: {fileID: 1617334495772175287, guid: 0d77fee9395752841a8fcbc21b6cca95, type: 3}
   bulletLineRenderer: {fileID: 2836209554584771588}
   bulletImpactPrefab: {fileID: 6944297588592120052, guid: 1a9b2db573458224db29f8df7a8dfc23, type: 3}
+  damageNotifierPrefab: {fileID: 7638514376043217603, guid: 4238a27ff41b6e0498ce68714757e794, type: 3}
+  health: 50
+  shootRange: 4
+  despawnRange: 8
+  shootCooldown: 3
+  despawnCooldown: 5
   rayDamage: 3
 --- !u!1 &7833324325492118954
 GameObject:

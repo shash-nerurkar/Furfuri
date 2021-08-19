@@ -21,6 +21,7 @@ public class Player : MonoBehaviour
     public GameObject HUD;
     public GameObject playerHUD;
     public GameObject levelEndLosePanel;
+    public GameObject damageNotifierPrefab;
     public AudioManager audioManager;
     public Camera cam;
     int health = 50;
@@ -29,13 +30,18 @@ public class Player : MonoBehaviour
     float speedSlowAmount;
     public Tilemap buildingTilemap;
 
+    void SetStartOrientation(Transform startTransform)
+    {
+        transform.position = startTransform.position;
+        transform.rotation = startTransform.rotation;
+    }
+
     void Start()
     {
         healthBarHUD.SetMaxHealth(health);
         healthBarHUD.SetMaxShield(shield);
         healthBar.SetMaxHealth(health);
         healthBar.SetMaxShield(shield);
-        levelEndLosePanel.SetActive(false);
     }
 
     void FixedUpdate() 
@@ -67,6 +73,7 @@ public class Player : MonoBehaviour
 
     public void TakeDamage(int damage) 
     {
+        Instantiate(damageNotifierPrefab, transform.position + new Vector3(0.5f, 0, 0), Quaternion.identity);//Quaternion.Inverse(transform.rotation));
         if(shield > 0)
         {
             --shield;
