@@ -2,11 +2,13 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.EventSystems;
+using UnityEngine.SceneManagement;
 using UnityEngine.UI;
 
 public class Arch : MonoBehaviour
 {
     public World world;
+    public GameObject HUD;
     public GameObject levelEndWinPanel;
     public Animator animator;
     public Animator playerAnimator;
@@ -26,12 +28,12 @@ public class Arch : MonoBehaviour
         }
         else
         {
-            animator = gameObject.GetComponent<Animator>();
             world = (World)FindObjectOfType(typeof(World));
 
             levelEndWinPanel = GameObject.Find("Level End Win Panel");
             levelEndWinPanel.SetActive(false);
 
+            HUD = GameObject.Find("HUD");
             playerAnimator = GameObject.Find("Player").GetComponent<Animator>();
             HUDAnimator = GameObject.Find("HUD").GetComponent<Animator>();
             playerHUDAnimator = GameObject.Find("Player HUD").GetComponent<Animator>();
@@ -54,7 +56,14 @@ public class Arch : MonoBehaviour
                         break;
                 }
             }
-            audioManager = (AudioManager)FindObjectOfType(typeof(AudioManager));
+
+            foreach(AudioManager auMan in (AudioManager[])FindObjectsOfType(typeof(AudioManager)))
+            {
+                if(auMan.gameObject.scene == SceneManager.GetSceneByName("Main"))
+                {
+                    audioManager = auMan;
+                }
+            }
         }
     }
 
@@ -62,26 +71,33 @@ public class Arch : MonoBehaviour
     {
         if(col.tag == "Player")
         {
-            foreach(MonoBehaviour obj in world.objectsToDisableOnLevelEnd)
-            {
-                obj.enabled = false;
-            }
-            levelEndWinPanel.SetActive(true);
+            world.DisableObjectsOnLevelEnd(false);
+            
+            HUD.SendMessage("PopulateEndPanel", levelEndWinPanel);
+            
             playerMovementJoystick.GetComponent<EventTrigger>().enabled = false;
             playerMovementJoystick.RevertToBasePosition();
+            
             playerShootButton.interactable = false;
+            
             animator.SetBool("Entered", true); // Arch animation
+            
             audioManager.Play("Win Music"); // Start game winning music
+            
             foreach(Transform childTransform in enemyContainerTransform) // Enemies anim to sad
             {
                 childTransform.gameObject.GetComponent<Animator>().SetBool("Sad", true);
             }
+            
             foreach(Transform childTransform in enemyContainerTransform) // Free all projectiles
             {
                 Destroy(childTransform.gameObject);
             }
+            
             HUDAnimator.SetInteger("Win", 1); // Hide HUD and Show level end win panel
+            
             playerAnimator.SetBool("Won", true); // Player anim shift to happy and Silence player status effects
+            
             playerHUDAnimator.SetBool("Visible", false);// Hide player HUD
         }
     }

@@ -17,43 +17,64 @@ public class Map : MonoBehaviour
     public AIPath mainPath;
     public Arch arch;
     public PolygonCollider2D cameraBoundary;
-    public Vector2 mapDimensions  { get; set; }
-    public Arch startArch { get; set; }
-    public Arch endArch { get; set; }
+    public Vector2 mapDimensions { get; set; }
+    public Arch startArch;
+    public Arch endArch;
     private Vector3 startPosition, endPosition;
     private int boundaryWallThickness = 2;
     private int cameraEdgePadding = 1;
-    public bool[,] buildingFlags { get; set; }
+    public bool[,] buildingFlags;
     private System.Random RNG;
-
-    void Start()
+    private SaveData saveData;
+    
+    void SetSaveData(SaveData sd)
     {
-        SaveData saveData = World.LoadGame();
+        saveData = sd;
+    }
+
+    void GenerateMap(string []levelParams)
+    {
+        ParseLevelParams(levelParams);
+
         RNG = new System.Random();
+        
         if(saveData != null)
         {
             parseSaveData(saveData);
         }
         else
         {
-            mapDimensions = new Vector2(30, 30);
             SetExtremities();
             SpawnBuildings();
         }
+        
         startPosition = startArch.transform.position - startArch.GetComponent<SpriteRenderer>().bounds.extents;
         player.SendMessage("SetStartOrientation", startArch.transform);
-
+        
         playerAI.transform.position = startArch.transform.position;
         playerAI.transform.rotation = startArch.transform.rotation;
         playerAI.GetComponent<AIDestinationSetter>().target = endArch.transform;
-        
+       
         endPosition = endArch.transform.position - endArch.GetComponent<SpriteRenderer>().bounds.extents;
+
         SpawnFloor();
         SpawnBoundaryWalls();
         SetCameraBoundary();
         StartCoroutine(SetAStarGrid());
         ClearPath();
         SpawnRoad();
+    }
+
+    void ParseLevelParams(string []levelParams)
+    {
+        foreach(string param in levelParams)
+        {
+            string []paramParts = param.Split(':');
+
+            typeof(Map).GetProperty(paramParts[0]).SetValue(this,
+                                                            new Vector2(float.Parse(paramParts[1].Split('(')[1].Split(',')[0]), 
+                                                                        float.Parse(paramParts[1].Split('(')[1].Split(',')[1].Trim(')'))));
+        }
     }
 
     void SetExtremities()
@@ -220,17 +241,17 @@ public class Map : MonoBehaviour
         Vector3Int mapCellDimensions = grid2.WorldToCell(mapDimensions);
         buildingFlags = new bool[mapCellDimensions.x, mapCellDimensions.y];
 
-        for(int i = 0; i < mapCellDimensions.x; i++)
-        {
-            for(int j = 0; j < mapCellDimensions.y; j++)
-            {
-                if(RNG.Next(2) == 1)
-                {
-                    buildingTilemap.SetTile(new Vector3Int(i, j, 0), buildingTile);
-                    buildingFlags[i, j] = true;
-                }
-            }
-        }
+        // for(int i = 0; i < mapCellDimensions.x; i++)
+        // {
+        //     for(int j = 0; j < mapCellDimensions.y; j++)
+        //     {
+        //         if(RNG.Next(2) == 1)
+        //         {
+        //             buildingTilemap.SetTile(new Vector3Int(i, j, 0), buildingTile);
+        //             buildingFlags[i, j] = true;
+        //         }
+        //     }
+        // }
     }
 
     IEnumerator SetAStarGrid()

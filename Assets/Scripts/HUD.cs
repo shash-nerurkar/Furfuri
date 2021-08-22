@@ -6,15 +6,17 @@ using System.Collections;
 
 public class HUD : MonoBehaviour
 {
+    public World world;
     public GameObject pausePanel;
     public Animator animator;
     public AudioManager audioManager;
     public Image muteButtonImage;
-    public TMP_Text time;
-    public TMP_Text score;
+    public TMP_Text HUDTime;
+    public TMP_Text HUDScore;
     public Coroutine timeUpdateCoroutine;
     public Sprite mutedButtonSprite;
     public Sprite unmutedButtonSprite;
+    public PersistAcrossScenes persistAcrossScenes;
     public bool muted;
 
     void Start()
@@ -38,21 +40,29 @@ public class HUD : MonoBehaviour
             }
         }
         timeUpdateCoroutine = StartCoroutine(UpdateTime());
+        persistAcrossScenes = (PersistAcrossScenes)GameObject.FindObjectOfType(typeof(PersistAcrossScenes));
     }
 
     IEnumerator UpdateTime()
     {
-        string[] timeParts = time.text.Split(':');
+        string[] timeParts = HUDTime.text.Split(':');
         int currentTime = int.Parse(timeParts[0]) * 60 + int.Parse(timeParts[1]);
         while(true)
         {
             yield return new WaitForSeconds(1f);
             ++currentTime;
-            time.text = (currentTime/60 < 10 ? ("0" + (currentTime/60).ToString()) : (currentTime/60).ToString())
-                      + ":"
-                      + (currentTime%60 < 10 ? ("0" + (currentTime%60).ToString()) : (currentTime%60).ToString());
+            HUDTime.text = (currentTime/60 < 10 ? ("0" + (currentTime/60).ToString()) : (currentTime/60).ToString())
+                          + ":"
+                          + (currentTime%60 < 10 ? ("0" + (currentTime%60).ToString()) : (currentTime%60).ToString());
         }
     } 
+
+    private void UpdateScore()
+    {
+        int currentScore = int.Parse(HUDScore.text);
+        ++currentScore;
+        HUDScore.text = currentScore.ToString();
+    }
 
     public void OnPauseButtonPressed()
     {
@@ -102,14 +112,40 @@ public class HUD : MonoBehaviour
 
     public void OnNextLevelButtonPressed()
     {
-        // ADD LEVEL CHANGE LOGIC
         audioManager.Play("Button Click");
-        SceneManager.LoadScene("Main Menu", LoadSceneMode.Single);
+
+        persistAcrossScenes.transitionSceneToLoad = "Main";
+        persistAcrossScenes.transitionSceneToDelete = "Main";
+        SceneManager.LoadScene("Transition", LoadSceneMode.Additive);
     }
 
     public void OnRestartLevelButtonPressed()
     {
-        SceneManager.LoadScene("Main", LoadSceneMode.Single);
+        audioManager.Play("Button Click");
+
+        persistAcrossScenes.transitionSceneToLoad = "Main";
+        persistAcrossScenes.transitionSceneToDelete = "Main";
+        SceneManager.LoadScene("Transition", LoadSceneMode.Additive);
+    }
+
+    public void PopulateEndPanel(GameObject panel)
+    {
+        foreach(Transform childTransform in panel.transform)
+        {
+            switch(childTransform.name)
+            {
+                case "Score":
+                    childTransform.GetComponent<TextMeshProUGUI>().text = "Coin score: " + HUDScore.text;
+                    break;
+                
+                case "Time":
+                    childTransform.GetComponent<TextMeshProUGUI>().text = "Time: " + HUDTime.text;
+                    break;
+                
+            }
+        }
+        //ADD TO SCORE ACCORDING TO TIME
+        panel.SetActive(true);
     }
 
     public void OnHUDHideFinished()

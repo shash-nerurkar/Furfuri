@@ -23,7 +23,12 @@ public class AudioManager : MonoBehaviour
 
         if(sound == null)
         {
-            Debug.LogWarning("SOUND " + sound + " NOT FOUND.");
+            string allSoundNames = "";
+            foreach(Sound s in sounds)
+            {
+                allSoundNames += s.name + ", ";
+            }
+            Debug.LogWarning("SOUND " + name + " NOT FOUND, AMONGST " + allSoundNames);
             return;
         }
 

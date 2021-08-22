@@ -73,7 +73,7 @@ public class Player : MonoBehaviour
 
     public void TakeDamage(int damage) 
     {
-        Instantiate(damageNotifierPrefab, transform.position + new Vector3(0.5f, 0, 0), Quaternion.identity);//Quaternion.Inverse(transform.rotation));
+        Instantiate(damageNotifierPrefab, transform.position + new Vector3(0.5f, 0, 0), Quaternion.identity);
         if(shield > 0)
         {
             --shield;
@@ -101,24 +101,29 @@ public class Player : MonoBehaviour
 
     public void OnDeathFinish()
     {
-        foreach(MonoBehaviour obj in world.objectsToDisableOnLevelEnd)
-        {
-            obj.enabled = false;
-        }
-        levelEndLosePanel.SetActive(true);
+        world.DisableObjectsOnLevelEnd(true);
+
+        HUD.SendMessage("PopulateEndPanel", levelEndLosePanel);
+
         movementJoystick.GetComponent<EventTrigger>().enabled = false;
         movementJoystick.RevertToBasePosition();
+
         shootButton.interactable = false;
+
         audioManager.Play("Lose Music"); // Start game losing music
+
         foreach(Transform enemyTransform in enemyContainerTransform) // Enemy anim shift to happy
         {
             enemyTransform.gameObject.GetComponent<Animator>().SetBool("Happy", true);
         }
+
         foreach(Transform projectileTransform in projectileContainerTransform) // Free all projectiles
         {
             Destroy(projectileTransform.gameObject);
         }
+
         HUD.GetComponent<Animator>().SetInteger("Win", -1);// Hide HUD and show Level end lose panel
+        
         playerHUD.GetComponent<Animator>().SetBool("Visible", false);// Hide player HUD
     }
     

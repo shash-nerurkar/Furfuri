@@ -32,6 +32,7 @@ public class Enemy : MonoBehaviour
     public LineRenderer bulletLineRenderer;
     public GameObject bulletImpactPrefab;
     public GameObject damageNotifierPrefab;
+    public GameObject coinPrefab;
     private float shootTimer;
     private float despawnTimer;
     public int health = 50;
@@ -41,6 +42,7 @@ public class Enemy : MonoBehaviour
     public float shootCooldown = 3.0f;
     public float despawnCooldown = 5.0f;
     public int rayDamage = 3;
+    public int coinsToSpawn { get; set; }
 
     void Start()
     {
@@ -141,7 +143,17 @@ public class Enemy : MonoBehaviour
             health = 0;
             animator.SetInteger("Alive", -1);
             animator.SetInteger("Shoot", 0);
+            SpawnCoins();
             state = State.Spawning;
+        }
+    }
+
+    void SpawnCoins()
+    {
+        for(int i = 0; i < coinsToSpawn; i++)
+        {
+            Coin coin = Instantiate(coinPrefab, transform.position, Quaternion.identity).GetComponent<Coin>();
+            coin.SendMessage("flingCoinFunction", transform.position + new Vector3(Random.Range(-5, 5), Random.Range(-5, 5), 0));
         }
     }
 
